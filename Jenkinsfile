@@ -61,7 +61,7 @@ pipeline {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             sh '''
-              newman run "${COLLECTION_DIR}/01申請廳主買域名.postman_collection.json" \
+              newman run "${COLLECTION_DIR}/申請廳主買域名.postman_collection.json" \
                 --environment "${ENV_FILE}" \
                 --export-environment "/tmp/exported_env.json" \
                 --insecure \
@@ -76,7 +76,7 @@ pipeline {
       }
     }
 
-    stage('取得廳主買域名項目資料 (Job狀態檢查)') {
+    stage('01-1取得廳主買域名項目資料 (Job狀態檢查)') {
       steps {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -192,12 +192,12 @@ pipeline {
       }
     }
 
-    stage('15清除測試域名') {
+    stage('01-2清除測試域名') {
       steps {
         script {
-          def collectionPath = "${COLLECTION_DIR}/15清除測試域名.postman_collection.json"
+          def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
           if (fileExists(collectionPath)) {
-            echo "🧹 開始執行測試資料清除 collection：15清除測試域名"
+            echo "🧹 開始執行測試資料清除 collection：清除測試域名"
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
               sh """
                 newman run "${collectionPath}" \
@@ -217,44 +217,12 @@ pipeline {
       }
     }
 
-    stage('Run 剩餘 Postman Collections') {
-      steps {
-        script {
-          def collections = [
-            "02申請刪除域名",
-            "03申請憑證",
-            "04申請展延憑證",
-            "06申請三級亂數"
-          ]
-
-          collections.each { name ->
-            def path = "${COLLECTION_DIR}/${name}.postman_collection.json"
-            if (fileExists(path)) {
-              sh """
-                echo ▶️ 執行 Postman 測試：${name}
-                newman run "${path}" \
-                  --environment "${ENV_FILE}" \
-                  --insecure \
-                  --reporters cli,json,html,junit,allure \
-                  --reporter-json-export "${REPORT_DIR}/${name}_report.json" \
-                  --reporter-html-export "${HTML_REPORT_DIR}/${name}_report.html" \
-                  --reporter-junit-export "${REPORT_DIR}/${name}_report.xml" \
-                  --reporter-allure-export "allure-results" || true
-              """
-            } else {
-              echo "⚠️ 跳過：找不到 collection 檔案：${path}"
-            }
-          }
-        }
-      }
-    }
-
     stage('Publish HTML Reports') {
       steps {
         publishHTML(target: [
           reportDir: "${HTML_REPORT_DIR}",
           reportFiles: '01_report.html', // 或其他主頁，依實際報告為主
-          reportName: 'Postman HTML Reports',
+          reportName: '申請廳主買域名 HTML Reports',
           allowMissing: true,
           alwaysLinkToLastBuild: true,
           keepAll: true
