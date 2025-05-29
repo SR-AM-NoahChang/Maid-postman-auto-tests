@@ -1,60 +1,62 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    COLLECTION_DIR = "/work/collections/collections"
-    REPORT_DIR = "/work/reports"
-    HTML_REPORT_DIR = "/work/reports/html"
-    ALLURE_RESULTS_DIR = "allure-results"
-    ENV_FILE = "/work/collections/environments/DEV.postman_environment.json"
-    WEBHOOK_URL = credentials('GOOGLE_CHAT_WEBHOOK')
-    BASE_URL = "http://maid-cloud.vir999.com"
-    ADM_KEY = credentials('DEV_ADM_KEY')
-  }
-
-  stages {
-    stage('Checkout Code') {
-      steps {
-        checkout scm
-      }
+    options {
+      skipDefaultCheckout(true)
     }
 
-    stage('Checkout Postman Collections') {
-      steps {
-        script {
-          sh 'rm -rf /work/collections/* || true'
+    environment {
+      COLLECTION_DIR = "${env.WORKSPACE}/collections"
+      REPORT_DIR = "${env.WORKSPACE}/reports"
+      HTML_REPORT_DIR = "${env.WORKSPACE}/reports/html"
+      ALLURE_RESULTS_DIR = "${env.WORKSPACE}/allure-results"
+      ENV_FILE = "${env.WORKSPACE}/environments/DEV.postman_environment.json"
+      WEBHOOK_URL = credentials('GOOGLE_CHAT_WEBHOOK')
+      BASE_URL = "http://maid-cloud.vir999.com"
+      ADM_KEY = credentials('DEV_ADM_KEY')
+    }
+
+    stages {
+      stage('Clean Workspace') {
+        steps {
+          echo '🧹 清理 Jenkins 工作目錄...'
+          deleteDir()
         }
-        dir('/work/collections') {
+      }
+
+      stage('Checkout Code') {
+        steps {
+          echo '📥 Checkout Git repo...'
+          checkout scm
+        }
+      }
+
+      stage('Show Commit Info') {
+        steps {
           sh '''
-            if [ ! -d .git ]; then
-              git clone https://github.com/SR-AM-NoahChang/PurchaseCertificate.git .
-            fi
-            git fetch origin main
-            git reset --hard origin/main
             echo "✅ 當前 Git commit：$(git rev-parse HEAD)"
             echo "📝 Commit 訊息：$(git log -1 --oneline)"
           '''
         }
       }
-    }
 
-    stage('Prepare Folders') {
-      steps {
-        script {
-          def timestamp = sh(script: "date +%Y%m%d_%H%M%S", returnStdout: true).trim()
-          sh """
-            mkdir -p /work/report_backup
-            if [ -d "${REPORT_DIR}" ]; then
-              mv ${REPORT_DIR} /work/report_backup/${timestamp}
-              chmod -R 755 /work/report_backup/${timestamp}
-              echo 📦 備份舊報告到 /work/report_backup/${timestamp}
-            fi
-            rm -rf ${REPORT_DIR} ${HTML_REPORT_DIR} allure-results
-            mkdir -p ${REPORT_DIR} ${HTML_REPORT_DIR} allure-results
-          """
+      stage('Prepare Folders') {
+        steps {
+          script {
+            def timestamp = sh(script: "date +%Y%m%d_%H%M%S", returnStdout: true).trim()
+            sh """
+              mkdir -p ${env.WORKSPACE}/report_backup
+              if [ -d "${REPORT_DIR}" ]; then
+                mv ${REPORT_DIR} ${env.WORKSPACE}/report_backup/${timestamp}
+                chmod -R 755 ${env.WORKSPACE}/report_backup/${timestamp}
+                echo 📦 備份舊報告到 ${env.WORKSPACE}/report_backup/${timestamp}
+              fi
+              rm -rf ${REPORT_DIR} ${HTML_REPORT_DIR} ${ALLURE_RESULTS_DIR}
+              mkdir -p ${REPORT_DIR} ${HTML_REPORT_DIR} ${ALLURE_RESULTS_DIR}
+            """
+          }
         }
       }
-    }
 
     stage('申請廳主買域名') {
       steps {
