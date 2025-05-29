@@ -239,7 +239,27 @@ pipeline {
     stage('申請憑證') {
       steps {
         script {
-          ef jobNameMap = [
+          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            sh '''
+              newman run "${COLLECTION_DIR}/申請憑證.postman_collection.json" \
+                --environment "${ENV_FILE}" \
+                --export-environment "/tmp/exported_env.json" \
+                --insecure \
+                --reporters cli,json,html,junit,allure \
+                --reporter-json-export "${REPORT_DIR}/PurchaseCertificate_report.json" \
+                --reporter-html-export "${HTML_REPORT_DIR}/PurchaseCertificate_report.html" \
+                --reporter-junit-export "${REPORT_DIR}/PurchaseCertificate_report.xml" \
+                --reporter-allure-export "allure-results"
+            '''
+          }
+        }
+      }
+    }
+
+    stage('取得購買憑證申請詳細資料 (Job狀態檢查)') {
+      steps {
+        script {
+          def jobNameMap = [
             "AddTag": "AddTag（新增 Tag）",
             "AddThirdLevelRandom": "AddThirdLevelRandom（設定三級亂數）",
             "AttachAntiBlockTarget": "AttachAntiBlockTarget（新增抗封鎖目標）",
@@ -280,27 +300,7 @@ pipeline {
             "VerifyDomainPDNSTags": "VerifyDomainPDNSTags（驗證域名 PDNS Tag）",
             "VerifyTLD": "VerifyTLD（驗證頂級域名）"
           ]
-
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            sh '''
-              newman run "${COLLECTION_DIR}/申請憑證.postman_collection.json" \
-                --environment "${ENV_FILE}" \
-                --export-environment "/tmp/exported_env.json" \
-                --insecure \
-                --reporters cli,json,html,junit,allure \
-                --reporter-json-export "${REPORT_DIR}/PurchaseCertificate_report.json" \
-                --reporter-html-export "${HTML_REPORT_DIR}/PurchaseCertificate_report.html" \
-                --reporter-junit-export "${REPORT_DIR}/PurchaseCertificate_report.xml" \
-                --reporter-allure-export "allure-results"
-            '''
-          }
-        }
-      }
-    }
-
-    stage('取得購買憑證申請詳細資料 (Job狀態檢查)') {
-      steps {
-        script {
+          
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             def exported = readJSON file: '/tmp/exported_env.json'
             def workflowId = exported.values.find { it.key == 'PC_WORKFLOW_ID' }?.value
