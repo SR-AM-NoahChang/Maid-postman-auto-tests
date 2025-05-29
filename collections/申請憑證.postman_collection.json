@@ -76,15 +76,10 @@
 					{
 						"key": "sec-ch-ua-platform",
 						"value": "\"macOS\""
-					},
-					{
-						"key": "Cookie",
-						"value": "G_ENABLED_IDPS=google; PHPSESSID=f4403c6f199c8d0548773115342911f2; G_AUTHUSER_H=0",
-						"disabled": true
 					}
 				],
 				"url": {
-					"raw": "https://pdns.vir999.com/update_dns_information.php?type=1&domain_name=sramtest01.com",
+					"raw": "https://pdns.vir999.com/update_dns_information.php?type=1&domain_name={{DOMAIN}}",
 					"protocol": "https",
 					"host": [
 						"pdns",
@@ -101,7 +96,7 @@
 						},
 						{
 							"key": "domain_name",
-							"value": "sramtest01.com"
+							"value": "{{DOMAIN}}"
 						}
 					]
 				},
@@ -116,12 +111,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200 (IP 解析)\", function () {",
+							"pm.test(\"Status code is 200 (更新DNS資訊)\", function () {",
 							"    pm.response.to.have.status(200);  // 檢查 HTTP 狀態碼是否為 200",
 							"});",
 							"setTimeout(function() {",
-							"    console.log(\"延遲 3 秒後執行下一個 API...\");",
-							"}, 3000); "
+							"    console.log(\"延遲 6 秒後執行下一個 API...\");",
+							"}, 6000); "
 						],
 						"type": "text/javascript",
 						"packages": {}

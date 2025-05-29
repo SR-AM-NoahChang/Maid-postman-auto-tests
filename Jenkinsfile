@@ -219,7 +219,7 @@ pipeline {
           if (fileExists(collectionPath)) {
             echo "🧹 開始執行測試資料清除 collection：清除測試域名"
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-              sh '''
+              sh """
                 newman run "${collectionPath}" \
                   --environment "${ENV_FILE}" \
                   --export-environment "/tmp/exported_env.json" \
@@ -229,7 +229,7 @@ pipeline {
                   --reporter-html-export "${HTML_REPORT_DIR}/DeleteDomain_cleanup_report.html" \
                   --reporter-junit-export "${REPORT_DIR}/DeleteDomain_cleanup_report.xml" \
                   --reporter-allure-export "allure-results"
-              '''
+              """
             }
           } else {
             echo "⚠️ 找不到 collection 檔案：${collectionPath}，跳過清除流程"
@@ -237,7 +237,6 @@ pipeline {
         }
       }
     }
-
 
     stage('取得刪除域名項目資料 (Job狀態檢查)') {
       steps {
