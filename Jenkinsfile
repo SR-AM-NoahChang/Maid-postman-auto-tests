@@ -56,7 +56,7 @@ pipeline {
       }
     }
 
-    stage('01申請廳主買域名') {
+    stage('申請廳主買域名') {
       steps {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -66,9 +66,9 @@ pipeline {
                 --export-environment "/tmp/exported_env.json" \
                 --insecure \
                 --reporters cli,json,html,junit,allure \
-                --reporter-json-export "${REPORT_DIR}/01_report.json" \
-                --reporter-html-export "${HTML_REPORT_DIR}/01_report.html" \
-                --reporter-junit-export "${REPORT_DIR}/01_report.xml" \
+                --reporter-json-export "${REPORT_DIR}/CustomerApplyPurchaseDomain_report.json" \
+                --reporter-html-export "${HTML_REPORT_DIR}/CustomerApplyPurchaseDomain_report.html" \
+                --reporter-junit-export "${REPORT_DIR}/CustomerApplyPurchaseDomain_report.xml" \
                 --reporter-allure-export "allure-results"
             '''
           }
@@ -76,7 +76,7 @@ pipeline {
       }
     }
 
-    stage('01-1取得廳主買域名項目資料 (Job狀態檢查)') {
+    stage('取得廳主買域名項目資料 (Job狀態檢查)') {
       steps {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -192,7 +192,27 @@ pipeline {
       }
     }
 
-    stage('01-2清除測試域名') {
+    stage('申請憑證') {
+      steps {
+        script {
+          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            sh '''
+              newman run "${COLLECTION_DIR}/申請憑證.postman_collection.json" \
+                --environment "${ENV_FILE}" \
+                --export-environment "/tmp/exported_env.json" \
+                --insecure \
+                --reporters cli,json,html,junit,allure \
+                --reporter-json-export "${REPORT_DIR}/PurchaseCertificate_report.json" \
+                --reporter-html-export "${HTML_REPORT_DIR}/PurchaseCertificate_report.html" \
+                --reporter-junit-export "${REPORT_DIR}/PurchaseCertificate_report.xml" \
+                --reporter-allure-export "allure-results"
+            '''
+          }
+        }
+      }
+    }
+
+    stage('刪除域名') {
       steps {
         script {
           def collectionPath = "${COLLECTION_DIR}/清除測試域名.postman_collection.json"
@@ -204,9 +224,9 @@ pipeline {
                   --environment "${ENV_FILE}" \
                   --insecure \
                   --reporters cli,json,html,junit,allure \
-                  --reporter-json-export "${REPORT_DIR}/15_cleanup_report.json" \
-                  --reporter-html-export "${HTML_REPORT_DIR}/15_cleanup_report.html" \
-                  --reporter-junit-export "${REPORT_DIR}/15_cleanup_report.xml" \
+                  --reporter-json-export "${REPORT_DIR}/DeleteDomain_cleanup_report.json" \
+                  --reporter-html-export "${HTML_REPORT_DIR}/DeleteDomain_cleanup_report.html" \
+                  --reporter-junit-export "${REPORT_DIR}/DeleteDomain_cleanup_report.xml" \
                   --reporter-allure-export "allure-results"
               """
             }
@@ -221,7 +241,7 @@ pipeline {
       steps {
         publishHTML(target: [
           reportDir: "${HTML_REPORT_DIR}",
-          reportFiles: '01_report.html', // 或其他主頁，依實際報告為主
+          reportFiles: 'PurchaseCertificate_report.html', // 或其他主頁，依實際報告為主
           reportName: '申請廳主買域名 HTML Reports',
           allowMissing: true,
           alwaysLinkToLastBuild: true,
