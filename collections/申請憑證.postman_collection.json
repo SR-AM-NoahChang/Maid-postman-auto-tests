@@ -110,6 +110,108 @@
 			"response": []
 		},
 		{
+			"name": "(PDNS) 域名商網址更新",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 (IP 解析)\", function () {",
+							"    pm.response.to.have.status(200);  // 檢查 HTTP 狀態碼是否為 200",
+							"});",
+							"setTimeout(function() {",
+							"    console.log(\"延遲 3 秒後執行下一個 API...\");",
+							"}, 3000); "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					},
+					{
+						"key": "Referer",
+						"value": "https://pdns.vir999.com/d_domains.php?site_group=dctest&login_code=dct"
+					},
+					{
+						"key": "Sec-Fetch-Dest",
+						"value": "empty"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "X-Requested-With",
+						"value": "XMLHttpRequest"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Google Chrome\";v=\"135\", \"Not-A.Brand\";v=\"8\", \"Chromium\";v=\"135\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "Cookie",
+						"value": "G_ENABLED_IDPS=google; PHPSESSID=f4403c6f199c8d0548773115342911f2; G_AUTHUSER_H=0",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://pdns.vir999.com/update_dns_information.php?type=2&domain_name={{DOMAIN}}",
+					"protocol": "https",
+					"host": [
+						"pdns",
+						"vir999",
+						"com"
+					],
+					"path": [
+						"update_dns_information.php"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "2"
+						},
+						{
+							"key": "domain_name",
+							"value": "{{DOMAIN}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl 'https://pdns.vir999.com/update_dns_information.php?type=1&domain_name=sramtest01.com' \\\n  -H 'Accept: */*' \\\n  -H 'Accept-Language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7' \\\n  -H 'Connection: keep-alive' \\\n  -b 'G_ENABLED_IDPS=google; PHPSESSID=f4403c6f199c8d0548773115342911f2; G_AUTHUSER_H=0' \\\n  -H 'Referer: https://pdns.vir999.com/d_domains.php?site_group=dctest&login_code=dct' \\\n  -H 'Sec-Fetch-Dest: empty' \\\n  -H 'Sec-Fetch-Mode: cors' \\\n  -H 'Sec-Fetch-Site: same-origin' \\\n  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36' \\\n  -H 'X-Requested-With: XMLHttpRequest' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"135\", \"Not-A.Brand\";v=\"8\", \"Chromium\";v=\"135\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"'"
+			},
+			"response": []
+		},
+		{
 			"name": "申請購買與部屬憑證",
 			"event": [
 				{
